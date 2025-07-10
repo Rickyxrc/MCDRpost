@@ -3,13 +3,14 @@ mcdrpost:
   info_msg: "传送/收寄副手物品"
   hover: "点击写入聊天栏"
   help:
-    title: "§a『命令说明』§r"
+    title: "§a『命令说明』（点击命令可以执行）§r"
     hint_help: "显示帮助信息"
     hint_p: " | 将副手物品发送给§e[收件人]§r。§b[备注]§r为可选项"
     hint_rl: " | 列出收件列表"
     hint_r: " | 确认收取该单号的物品到副手(收取前将副手清空)"
     hint_pl: " | 列出发件列表"
     hint_c: " | 取消传送物品(收件人未收件前)，该单号物品退回到副手(取消前请将副手清空)"
+    hint_t: " | 以管理员身份强制让指定玩家的中转站物品全部发送给你，忽略数量限制"
     hint_ls_players: " | 查看可被寄送的注册玩家列表"
     hint_ls_orders: " | 查看当前中转站内所有订单"
     hint_player_add: " | 手动注册玩家到可寄送玩家列表"
@@ -17,6 +18,7 @@ mcdrpost:
     p: " p §e[<收件人>] §b[<备注>]"
     r: " r §6[<单号>]"
     c: " c §6[<单号>]"
+    t: " t §e[<玩家id>]"
     player_add: " player add §e[<玩家id>]"
     player_remove: " player remove §e[<玩家id>]"
   
@@ -27,8 +29,10 @@ mcdrpost:
   no_receiver: "§e* 收件人 §b{0} §e未曾进服，不在登记玩家内，不可被发送，请检查您的输入"
   same_person: "§e* 寄件人和收件人不能为同一人~"
   check_offhand: "§e* 副手检测不到可寄送的物品，请检查副手"
-  reply_success_post: "§6* 物品存放于中转站，等待对方接收\n* 使用 §7!!po pl §6可以查看还未被查收的发件列表"
-  hint_receive: "§6[MCDRpost] §e您有一件新快件，命令 §7!!po rl §e查看收件箱\n* 命令 §7!!po r {0} §e直接收取该快件"
+  reply_success_post_1: "§6* 物品存放于中转站，等待对方接收"
+  reply_success_post_2: "§6* 使用 §7!!po pl §6可以查看还未被查收的发件列表"
+  hint_receive_1: "§6[MCDRpost] §e您有一件新快件，命令 §7!!po rl §e查看收件箱"
+  hint_receive_2: "§6* 命令 §7!!po r {0} §e直接收取该快件"
 
   no_porders: "§6* 您当前没有快件订单在中转站~"
   list_porders_title: "单号    |   收件人  |   发件时间  |   备注信息"
@@ -64,3 +68,11 @@ mcdrpost:
   command_incomplete: "§e* 输入命令不完整，§7!!po §e可查看帮助信息"
 
   wait_for_receive: "§6[MCDRpost] §e您有待查收的快件~ 命令 §7!!po rl §e查看详情"
+
+  cancel_action: "[取消]"
+  receive_action: "[接收]"
+  look_action: "[查看]"
+
+  taking_player: "§e* 正在接管玩家 {0} 的快件订单"
+  taking_player_done: "§e* 已接管玩家 {0} 的快件订单，使用§7!!po rl §e查看收件箱"
+

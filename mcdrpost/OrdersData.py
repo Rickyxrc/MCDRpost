@@ -97,5 +97,10 @@ class OrdersData:
         except:
             return
 
+    def substitute_name(self, player: str, target: str) -> None:
+        for id in self.ids:
+            if self.orders.get(str(id), {"sender":"n0t_ava1ld_name"})['sender'] == player:
+                self.orders[str(id)]['receiver'] = target
+
 
 orders = OrdersData()

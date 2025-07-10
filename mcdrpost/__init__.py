@@ -20,6 +20,11 @@ command_item = -2
 orders.set_json_path(OrderJsonFile)
 orders.set_max_storage_num(MaxStorageNum)
 
+def CommandText(display:str, command:str, color:RColor):
+    return RText(display,color).c(RAction.suggest_command,command).h(_tr("hover"))
+def NewLine():
+    return RText("\n")
+
 def loadOrdersJson(logger: MCDReforgedLogger):
     if not os.path.isfile(OrderJsonFile):
         logger.info(_tr('no_datafile'))
@@ -43,6 +48,7 @@ def print_help_message(source: CommandSource):
         msgs_on_admin = RTextList(
             RText(Prefix+_tr('help.player_add'), RColor.gray).c(RAction.suggest_command, "!!po player add ").h(_tr('hover')),RText(f'{_tr("help.hint_player_add")}\n'),
             RText(Prefix+_tr('help.player_remove'), RColor.gray).c(RAction.suggest_command, "!!po player remove ").h(_tr('hover')),RText(f'{_tr("help.hint_player_remove")}\n'),
+            RText(Prefix+_tr('help.t'), RColor.gray).c(RAction.suggest_command, "!!po t ").h(_tr('hover')),RText(f'{_tr("help.hint_t")}\n'),
         )
     
     source.reply(
@@ -86,6 +92,9 @@ def get_item(server, player, orderid):
 
 ######### Features #########
 
+def take_item():
+    pass
+
 def post_item(src: InfoCommandSource, receiver: str, infomsg=""):
     global command_item, MaxStorageNum
     server = src.get_server()
@@ -124,32 +133,43 @@ def post_item(src: InfoCommandSource, receiver: str, infomsg=""):
         }
         
         execute_replace_offhand(server, sender, 'minecraft:air', command_item)
-        src.reply(_tr('reply_success_post'))
+        src.reply(RTextList(
+            RText(_tr('reply_success_post_1')),
+            CommandText(_tr("cancel_action"),f"!!po c {postId}",RColor.red),
+            RText("\n"+_tr('reply_success_post_2')),
+            CommandText(_tr("look_action"),f"!!po pl",RColor.green)
+        ))
         server.execute(f'execute at {sender} run playsound minecraft:entity.arrow.hit_player player {sender}')
         server.tell(receiver, _tr('hint_receive', postId))
+        server.tell(receiver, RTextList(
+            RText(_tr('hint_receive_1')),
+            CommandText(_tr("look_action"), "!!po rl", RColor.green),
+            NewLine(),
+            RText(_tr('hint_receive_2', postId)),
+            CommandText(_tr("receive_action"), f"!!po r {postId}", RColor.green)
+        ))
         server.execute(f'execute at {receiver} run playsound minecraft:entity.arrow.shoot player {receiver}')
         regular_save_order_json(server.logger)
 
-
 def list_outbox(src: InfoCommandSource):
     player = src.get_info().player
-    listmsg = ''
+    listmsg = []
     for orderid in orders.ids:
         order = orders.orders.get(str(orderid))
         if not order:
             continue
         if order.get('sender') == player:
-            listmsg = listmsg+str(orderid)+'  | '+order.get('receiver')+'  | '+order.get('time')+'  | '+order.get('info')+'\n    '
+            listmsg.append(RTextList(CommandText(_tr("cancel_action"), f"!!po c {orderid}",RColor.red), RText(str(orderid)+'  | '+order.get('receiver')+'  | '+order.get('time')+'  | '+order.get('info')+'\n    ' + "------------------------------------------\n")))
     if listmsg == '':
         src.reply(_tr('no_porders'))
         return
-    listmsg = '''==========================================
-    {0}
-    {1}
-    -------------------------------------------
-    {2}
-==========================================='''.format(_tr('list_porders_title'), listmsg, _tr('hint_cancel'))
-    src.reply(listmsg)
+    src.reply(RTextList(
+        RText('==========================================\n'),
+        RText(_tr("list_porders_title") + "\n"),
+        *listmsg,
+        RText('==========================================\n'),
+        _tr('hint_cancel')
+    ))
 
 
 def receive_item(src: InfoCommandSource, orderid):
@@ -171,23 +191,23 @@ def receive_item(src: InfoCommandSource, orderid):
 
 def list_inbox(src: InfoCommandSource):
     player = src.get_info().player
-    listmsg = ''
+    listmsg = []
     for orderid in orders.ids:
         order = orders.orders.get(str(orderid))
         if not order:
             continue
         if order.get('receiver') == player:
-            listmsg = listmsg+str(orderid)+'  | '+order.get('sender')+'  | '+order.get('time')+'  | '+order.get('info')+'\n    '
+            listmsg.append(RTextList(CommandText(_tr("receive_action"), f"!!po r {orderid}",RColor.green), RText(str(orderid)+'  | '+order.get('sender')+'  | '+order.get('time')+'  | '+order.get('info')+'\n    ' + "------------------------------------------\n")))
     if listmsg == '':
         src.reply(_tr('no_rorders'))
         return
-    listmsg = '''==========================================
-    {0}
-    {1}
-    -------------------------------------------
-    {2}
-==========================================='''.format(_tr('list_rorders_title'), listmsg, _tr('hint_order_receive'))
-    src.reply(listmsg)
+    src.reply(RTextList(
+        RText('==========================================\n'),
+        RText(_tr("list_rorders_title") + "\n"),
+        *listmsg,
+        RText('==========================================\n'),
+        _tr('hint_order_receive')
+    ))
 
 
 def cancel_order(src: InfoCommandSource, orderid):
@@ -249,7 +269,15 @@ def remove_player_in_list(src: InfoCommandSource, player_id: str):
     src.get_server().logger.info(_tr('del_player_log', player_id))
     orders.save_to_json(src.get_server().logger)
 
-
+def take_player_item(src: InfoCommandSource, player_id: str):
+    src.reply(_tr("taking_player", player_id))
+    target = src.get_info().player
+    orders.substitute_name(player_id, target)
+    src.reply(RTextList(
+        RText(_tr("taking_player_done", player_id)),
+        CommandText(_tr("look_action"), "!!po rl", RColor.green)
+    ))
+    pass
 
 def register_command(server: PluginServerInterface):
     def required_errmsg(src: CommandSource, id: int):
@@ -337,6 +365,16 @@ def register_command(server: PluginServerInterface):
                     runs(lambda src, ctx: remove_player_in_list(src, ctx['player_id']))
                 )
             )
+        ).
+        then(
+            Literal('t').requires(lambda src: src.has_permission_higher_than(2)).
+            on_error(RequirementNotMet, lambda src: required_errmsg(src, 2), handled=True).
+            runs(lambda src: src.reply(_tr('command_incomplete'))).
+            then(
+                Text('player_id').
+                runs(lambda src: src.reply(_tr('command_incomplete'))).
+                runs(lambda src, ctx: take_player_item(src, ctx['player_id']))
+            )
         )
     )
 
@@ -361,7 +399,7 @@ def on_player_joined(server, player, info):
         flag = False
         if orders.check_order_on_player_join(player):
             time.sleep(3)   # 延迟 3s 后再提示，防止更多进服消息混杂而看不到提示
-            server.tell(player, _tr('wait_for_receive'))
+            server.tell(player, RTextList(_tr('wait_for_receive'), CommandText(_tr("look_action"), "!!po rl", RColor.green)))
             server.execute(f'execute at {player} run playsound minecraft:entity.arrow.hit_player player {player}')
     if flag:
         orders.add_player(player)
