@@ -1,0 +1,21 @@
+[project]
+name = "mcdrpost"
+version = "2.1.0"
+description = "[fixed]A MCDR plugin for post/teleport items"
+authors = [
+    {name = "Flyky"},
+    {name = "Rickyxrc",email = "rickyxrc@outlook.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+mcdreforged = "^2.14.7"
+

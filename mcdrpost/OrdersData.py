@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from mcdreforged.utils.logger import MCDReforgedLogger
+from mcdreforged.logging.logger import MCDReforgedLogger
 
 class OrdersData:
     def __init__(self):

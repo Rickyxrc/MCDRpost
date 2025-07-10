@@ -1,18 +1,21 @@
 {
-    "id": "mcdrpost",
-    "version": "2.1.0",
-    "name": "MCDRpost",
-    "description": {
-        "en_us": "A MCDR plugin for post/teleport items",
-        "zh_cn": "一个用于邮寄/传送物品的MCDR插件"
-    },
-    "author": ["Flyky"],
-    "link": "https://github.com/Flyky/MCDRpost",
-    "dependencies": {
-        "mcdreforged": ">=2.0.1",
-        "minecraft_data_api": "*"
-    },
-    "resources": [
-        "lang"
-    ]
+  "id": "mcdrpost",
+  "version": "2.1.0",
+  "name": "MCDRpost_fix",
+  "description": {
+    "en_us": "[fixed]A MCDR plugin for post/teleport items",
+    "zh_cn": "[已修复]一个用于邮寄/传送物品的MCDR插件"
+  },
+  "author": [
+    "Flyky",
+    "Rickyxrc"
+  ],
+  "link": "https://github.com/Rickyxrc/MCDRpost",
+  "dependencies": {
+    "mcdreforged": ">=2.0.1",
+    "minecraft_data_api": "*"
+  },
+  "resources": [
+    "lang"
+  ]
 }
